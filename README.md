@@ -3,7 +3,15 @@ prelude-amd
 
 An AMD compatible version of **[prelude.ls](http://preludels.com)**
 
-To build from the source (from the prelude dir) run :
+Available in the top directory as prelude.max.js and prelude.js (the uglified version)
 
-- npm install
-- gulp
+## Dev
+
+1 - Clone the prelude-ls source in this dir :
+`git clone https://github.com/gkz/prelude-ls.git`
+
+2 - Install gulp pipeline
+`npm install`
+
+3 - Build the AMD files
+`gulp`

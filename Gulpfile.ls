@@ -5,6 +5,8 @@ require! [
 concat = require 'gulp-concat'
 header = require 'gulp-header'
 livescript = require 'gulp-livescript'
+rename = require 'gulp-rename'
+uglify = require 'gulp-uglify'
 map = require 'map-stream'
 
 parse = ->
@@ -29,9 +31,12 @@ parse = ->
 		cb null, file
 
 gulp.task 'default', !->
-	gulp.src 'prelude/*.ls'
+	gulp.src 'prelude-ls/src/*.ls'
 	.pipe parse!
-	.pipe concat 'prelude.ls'
+	.pipe concat 'prelude.max.js'
 	.pipe header '<- define\n'
 	.pipe livescript!
-	.pipe gulp.dest 'dist'
+	.pipe gulp.dest '.'
+	.pipe rename 'prelude.js'
+	.pipe uglify mangle: false
+	.pipe gulp.dest '.'
