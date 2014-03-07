@@ -1,8 +1,8 @@
 {
   "name": "prelude-amd",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An AMD compatible version of prelude.ls",
-  "main": "index.js",
+  "main": "prelude.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

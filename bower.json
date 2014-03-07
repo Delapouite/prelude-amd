@@ -1,0 +1,24 @@
+{
+  "name": "prelude-amd",
+  "version": "0.0.3",
+  "description": "An AMD compatible version of prelude.ls",
+  "homepage": "https://github.com/Delapouite/prelude-amd",
+  "authors": [
+    "Delapouite <delapouite@gmail.com>"
+  ],
+  "main": "prelude.js",
+  "keywords": [
+    "LiveScript",
+    "prelude",
+    "prelude.ls",
+    "AMD"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
