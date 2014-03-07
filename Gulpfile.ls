@@ -38,5 +38,5 @@ gulp.task 'default', !->
 	.pipe livescript!
 	.pipe gulp.dest '.'
 	.pipe rename 'prelude.js'
-	.pipe uglify mangle: false
+	.pipe uglify mangle: true, reserved: 'define'
 	.pipe gulp.dest '.'

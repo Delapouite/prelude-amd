@@ -1,6 +1,6 @@
 {
   "name": "prelude-amd",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An AMD compatible version of prelude.ls",
   "main": "prelude.js",
   "scripts": {
