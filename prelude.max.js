@@ -3,7 +3,10 @@
   define(function(){
     var Func, List, Num, Obj, Str, id, isType, replicate, prelude;
     Func = function(){
-      var curry, flip, fix, apply;
+      var apply, curry, flip, fix, over;
+      apply = curry$(function(f, list){
+        return f.apply(null, list);
+      });
       curry = function(f){
         return curry$(f);
       };
@@ -11,28 +14,29 @@
         return f(y, x);
       });
       fix = function(f){
-        return function(g, x){
+        return function(g){
           return function(){
             return f(g(g)).apply(null, arguments);
           };
-        }(function(g, x){
+        }(function(g){
           return function(){
             return f(g(g)).apply(null, arguments);
           };
         });
       };
-      apply = curry$(function(f, list){
-        return f.apply(null, list);
+      over = curry$(function(f, g, x, y){
+        return f(g(x), g(y));
       });
       return {
         curry: curry,
         flip: flip,
         fix: fix,
-        apply: apply
+        apply: apply,
+        over: over
       };
     }();
     List = function(){
-      var each, map, compact, filter, reject, partition, find, head, first, tail, last, initial, empty, reverse, unique, fold, foldl, fold1, foldl1, foldr, foldr1, unfoldr, concat, concatMap, flatten, difference, intersection, union, countBy, groupBy, andList, orList, any, all, sort, sortWith, sortBy, sum, product, mean, average, maximum, minimum, maximumBy, minimumBy, scan, scanl, scan1, scanl1, scanr, scanr1, slice, take, drop, splitAt, takeWhile, dropWhile, span, breakList, zip, zipWith, zipAll, zipAllWith;
+      var each, map, compact, filter, reject, partition, find, head, first, tail, last, initial, empty, reverse, unique, uniqueBy, fold, foldl, fold1, foldl1, foldr, foldr1, unfoldr, concat, concatMap, flatten, difference, intersection, union, countBy, groupBy, andList, orList, any, all, sort, sortWith, sortBy, sum, product, mean, average, maximum, minimum, maximumBy, minimumBy, scan, scanl, scan1, scanl1, scanr, scanr1, slice, take, drop, splitAt, takeWhile, dropWhile, span, breakList, zip, zipWith, zipAll, zipAllWith, at, elemIndex, elemIndices, findIndex, findIndices;
       each = curry$(function(f, xs){
         var i$, len$, x;
         for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
@@ -131,17 +135,29 @@
         return xs.concat().reverse();
       };
       unique = function(xs){
-        var result, soFar, i$, len$, x;
+        var result, i$, len$, x;
         result = [];
-        soFar = {};
         for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
           x = xs[i$];
-          if (!soFar[x]) {
+          if (!in$(x, result)) {
             result.push(x);
-            soFar[x] = true;
           }
         }
         return result;
+      };
+      uniqueBy = function(f, xs){
+        var seen, i$, len$, x, val, results$ = [];
+        seen = [];
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          x = xs[i$];
+          val = f(x);
+          if (in$(val, seen)) {
+            continue;
+          }
+          seen.push(val);
+          results$.push(x);
+        }
+        return results$;
       };
       fold = foldl = curry$(function(f, memo, xs){
         var i$, len$, x;
@@ -571,6 +587,55 @@
           return results$;
         }
       };
+      at = curry$(function(n, xs){
+        if (n < 0) {
+          return xs[xs.length + n];
+        } else {
+          return xs[n];
+        }
+      });
+      elemIndex = curry$(function(el, xs){
+        var i$, len$, i, x;
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          i = i$;
+          x = xs[i$];
+          if (x === el) {
+            return i;
+          }
+        }
+      });
+      elemIndices = curry$(function(el, xs){
+        var i$, len$, i, x, results$ = [];
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          i = i$;
+          x = xs[i$];
+          if (x === el) {
+            results$.push(i);
+          }
+        }
+        return results$;
+      });
+      findIndex = curry$(function(f, xs){
+        var i$, len$, i, x;
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          i = i$;
+          x = xs[i$];
+          if (f(x)) {
+            return i;
+          }
+        }
+      });
+      findIndices = curry$(function(f, xs){
+        var i$, len$, i, x, results$ = [];
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          i = i$;
+          x = xs[i$];
+          if (f(x)) {
+            results$.push(i);
+          }
+        }
+        return results$;
+      });
       return {
         each: each,
         map: map,
@@ -603,6 +668,7 @@
         any: any,
         all: all,
         unique: unique,
+        uniqueBy: uniqueBy,
         sort: sort,
         sortWith: sortWith,
         sortBy: sortBy,
@@ -634,7 +700,12 @@
         zip: zip,
         zipWith: zipWith,
         zipAll: zipAll,
-        zipAllWith: zipAllWith
+        zipAllWith: zipAllWith,
+        at: at,
+        elemIndex: elemIndex,
+        elemIndices: elemIndices,
+        findIndex: findIndex,
+        findIndices: findIndices
       };
     }();
     Num = function(){
@@ -898,7 +969,7 @@ if (!f(x)) {
       };
     }();
     Str = function(){
-      var split, join, lines, unlines, words, unwords, chars, unchars, reverse, repeat;
+      var split, join, lines, unlines, words, unwords, chars, unchars, reverse, repeat, capitalize, camelize, dasherize;
       split = curry$(function(sep, str){
         return str.split(sep);
       });
@@ -941,6 +1012,27 @@ if (!f(x)) {
         out = res$;
         return out.join('');
       });
+      capitalize = function(str){
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      };
+      camelize = function(it){
+        return it.replace(/[-_]+(.)?/g, function(arg$, c){
+          return (c != null ? c : '').toUpperCase();
+        });
+      };
+      dasherize = function(str){
+        return str.replace(/([^-A-Z])([A-Z]+)/g, function(arg$, lower, upper){
+          return lower + "-" + (upper.length > 1
+            ? upper
+            : upper.toLowerCase());
+        }).replace(/^([A-Z]+)/, function(arg$, upper){
+          if (upper.length > 1) {
+            return upper + "-";
+          } else {
+            return upper.toLowerCase();
+          }
+        });
+      };
       return {
         split: split,
         join: join,
@@ -951,7 +1043,10 @@ if (!f(x)) {
         chars: chars,
         unchars: unchars,
         reverse: reverse,
-        repeat: repeat
+        repeat: repeat,
+        capitalize: capitalize,
+        camelize: camelize,
+        dasherize: dasherize
       };
     }();
     id = function(x){
@@ -1017,6 +1112,7 @@ if (!f(x)) {
     prelude.any = List.any;
     prelude.all = List.all;
     prelude.unique = List.unique;
+    prelude.uniqueBy = List.uniqueBy;
     prelude.sort = List.sort;
     prelude.sortWith = List.sortWith;
     prelude.sortBy = List.sortBy;
@@ -1049,10 +1145,16 @@ if (!f(x)) {
     prelude.zipWith = List.zipWith;
     prelude.zipAll = List.zipAll;
     prelude.zipAllWith = List.zipAllWith;
+    prelude.at = List.at;
+    prelude.elemIndex = List.elemIndex;
+    prelude.elemIndices = List.elemIndices;
+    prelude.findIndex = List.findIndex;
+    prelude.findIndices = List.findIndices;
     prelude.apply = Func.apply;
     prelude.curry = Func.curry;
     prelude.flip = Func.flip;
     prelude.fix = Func.fix;
+    prelude.over = Func.over;
     prelude.split = Str.split;
     prelude.join = Str.join;
     prelude.lines = Str.lines;
@@ -1061,6 +1163,10 @@ if (!f(x)) {
     prelude.unwords = Str.unwords;
     prelude.chars = Str.chars;
     prelude.unchars = Str.unchars;
+    prelude.repeat = Str.repeat;
+    prelude.capitalize = Str.capitalize;
+    prelude.camelize = Str.camelize;
+    prelude.dasherize = Str.dasherize;
     prelude.values = Obj.values;
     prelude.keys = Obj.keys;
     prelude.pairsToObj = Obj.pairsToObj;
