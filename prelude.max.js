@@ -103,9 +103,6 @@
         }
       });
       head = first = function(xs){
-        if (!xs.length) {
-          return;
-        }
         return xs[0];
       };
       tail = function(xs){
@@ -115,18 +112,13 @@
         return xs.slice(1);
       };
       last = function(xs){
-        if (!xs.length) {
-          return;
-        }
         return xs[xs.length - 1];
       };
       initial = function(xs){
-        var len;
-        len = xs.length;
-        if (!len) {
+        if (!xs.length) {
           return;
         }
-        return xs.slice(0, len - 1);
+        return xs.slice(0, -1);
       };
       empty = function(xs){
         return !xs.length;
@@ -171,12 +163,15 @@
         return fold(f, xs[0], xs.slice(1));
       });
       foldr = curry$(function(f, memo, xs){
-        return fold(f, memo, xs.concat().reverse());
+        var i$, x;
+        for (i$ = xs.length - 1; i$ >= 0; --i$) {
+          x = xs[i$];
+          memo = f(x, memo);
+        }
+        return memo;
       });
       foldr1 = curry$(function(f, xs){
-        var ys;
-        ys = xs.concat().reverse();
-        return fold(f, ys[0], ys.slice(1));
+        return foldr(f, xs[xs.length - 1], xs.slice(0, -1));
       });
       unfoldr = curry$(function(f, b){
         var result, x, that;
@@ -344,15 +339,9 @@
         });
       };
       sortWith = curry$(function(f, xs){
-        if (!xs.length) {
-          return [];
-        }
         return xs.concat().sort(f);
       });
       sortBy = curry$(function(f, xs){
-        if (!xs.length) {
-          return [];
-        }
         return xs.concat().sort(function(x, y){
           if (f(x) > f(y)) {
             return 1;
@@ -382,14 +371,13 @@
         return result;
       };
       mean = average = function(xs){
-        var sum, len, i$, i;
+        var sum, i$, len$, x;
         sum = 0;
-        len = xs.length;
-        for (i$ = 0; i$ < len; ++i$) {
-          i = i$;
-          sum += xs[i];
+        for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
+          x = xs[i$];
+          sum += x;
         }
-        return sum / len;
+        return sum / xs.length;
       };
       maximum = function(xs){
         var max, i$, ref$, len$, x;
@@ -470,14 +458,12 @@
       take = curry$(function(n, xs){
         if (n <= 0) {
           return xs.slice(0, 0);
-        } else if (!xs.length) {
-          return xs;
         } else {
           return xs.slice(0, n);
         }
       });
       drop = curry$(function(n, xs){
-        if (n <= 0 || !xs.length) {
+        if (n <= 0) {
           return xs;
         } else {
           return xs.slice(n);
@@ -887,10 +873,10 @@
         return true;
       };
       each = curry$(function(f, object){
-        var i$, x;
-        for (i$ in object) {
-          x = object[i$];
-          f(x);
+        var k, x;
+        for (k in object) {
+          x = object[k];
+          f(x, k);
         }
         return object;
       });
@@ -898,7 +884,7 @@
         var k, x, results$ = {};
         for (k in object) {
           x = object[k];
-          results$[k] = f(x);
+          results$[k] = f(x, k);
         }
         return results$;
       });
@@ -916,7 +902,7 @@ if (x) {
         var k, x, results$ = {};
         for (k in object) {
           x = object[k];
-if (f(x)) {
+if (f(x, k)) {
             results$[k] = x;
           }
         }
@@ -926,7 +912,7 @@ if (f(x)) {
         var k, x, results$ = {};
         for (k in object) {
           x = object[k];
-if (!f(x)) {
+if (!f(x, k)) {
             results$[k] = x;
           }
         }
@@ -938,7 +924,7 @@ if (!f(x)) {
         failed = {};
         for (k in object) {
           x = object[k];
-          (f(x) ? passed : failed)[k] = x;
+          (f(x, k) ? passed : failed)[k] = x;
         }
         return [passed, failed];
       });
@@ -1004,13 +990,12 @@ if (!f(x)) {
         return str.split('').reverse().join('');
       };
       repeat = curry$(function(n, str){
-        var out, res$, i$;
-        res$ = [];
+        var result, i$;
+        result = '';
         for (i$ = 0; i$ < n; ++i$) {
-          res$.push(str);
+          result += str;
         }
-        out = res$;
-        return out.join('');
+        return result;
       });
       capitalize = function(str){
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -1205,7 +1190,7 @@ if (!f(x)) {
     prelude.odd = Num.odd;
     prelude.gcd = Num.gcd;
     prelude.lcm = Num.lcm;
-    prelude.VERSION = '1.0.3';
+    prelude.VERSION = '1.1.0';
     return prelude;
   });
   function curry$(f, bound){
