@@ -137,7 +137,7 @@
         }
         return result;
       };
-      uniqueBy = function(f, xs){
+      uniqueBy = curry$(function(f, xs){
         var seen, i$, len$, x, val, results$ = [];
         seen = [];
         for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
@@ -150,7 +150,7 @@
           results$.push(x);
         }
         return results$;
-      };
+      });
       fold = foldl = curry$(function(f, memo, xs){
         var i$, len$, x;
         for (i$ = 0, len$ = xs.length; i$ < len$; ++i$) {
@@ -412,7 +412,7 @@
         }
         return max;
       });
-      minimumBy = function(f, xs){
+      minimumBy = curry$(function(f, xs){
         var min, i$, ref$, len$, x;
         min = xs[0];
         for (i$ = 0, len$ = (ref$ = xs.slice(1)).length; i$ < len$; ++i$) {
@@ -422,7 +422,7 @@
           }
         }
         return min;
-      };
+      });
       scan = scanl = curry$(function(f, memo, xs){
         var last, x;
         last = memo;
@@ -854,12 +854,12 @@
         }
         return results$;
       });
-      objToLists = function(objectect){
+      objToLists = function(object){
         var keys, values, key, value;
         keys = [];
         values = [];
-        for (key in objectect) {
-          value = objectect[key];
+        for (key in object) {
+          value = object[key];
           keys.push(key);
           values.push(value);
         }
@@ -1190,7 +1190,7 @@ if (!f(x, k)) {
     prelude.odd = Num.odd;
     prelude.gcd = Num.gcd;
     prelude.lcm = Num.lcm;
-    prelude.VERSION = '1.1.0';
+    prelude.VERSION = '1.1.1';
     return prelude;
   });
   function curry$(f, bound){
