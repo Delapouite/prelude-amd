@@ -1,7 +1,7 @@
 prelude-amd
 ===========
 
-An AMD compatible version of **[prelude.ls](http://preludels.com)** 1.10
+An AMD compatible version of **[prelude.ls](http://preludels.com)** 1.1.1
 
 Available in the top directory as prelude.max.js and prelude.js (the uglified version)
 
